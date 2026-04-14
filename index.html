@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vår ungdoms hits – Nostalgiaquiz</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f5f4f0; color: #1a1a1a; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+  #app { width: 100%; max-width: 640px; }
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: 26px; font-weight: 600; margin-bottom: 4px; }
+  .header p { font-size: 14px; color: #666; }
+  .progress-bg { background: #e0ddd6; border-radius: 99px; height: 6px; margin-bottom: 1.5rem; }
+  .progress-fill { background: #533AB7; height: 6px; border-radius: 99px; transition: width 0.4s ease; }
+  .card { background: #fff; border: 1px solid #e0ddd6; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .cat-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #f0eee8; color: #666; border: 1px solid #e0ddd6; margin-bottom: 6px; }
+  .q-meta { font-size: 12px; color: #999; margin-bottom: 6px; }
+  .q-text { font-size: 17px; font-weight: 500; line-height: 1.5; margin-bottom: 1.25rem; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .opt { background: #f5f4f0; border: 1px solid #e0ddd6; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #1a1a1a; cursor: pointer; text-align: left; line-height: 1.4; transition: background 0.15s, border-color 0.15s; font-family: inherit; }
+  .opt:hover:not(:disabled) { background: #eceae4; border-color: #ccc; }
+  .opt.correct { background: #eaf3de; border-color: #639922; color: #27500a; }
+  .opt.wrong { background: #fcebeb; border-color: #a32d2d; color: #501313; }
+  .opt.reveal { background: #eaf3de; border-color: #639922; color: #27500a; }
+  .opt:disabled { cursor: default; }
+  .feedback { font-size: 13px; margin-top: 10px; min-height: 18px; color: #666; line-height: 1.5; }
+  .feedback.ok { color: #3b6d11; }
+  .feedback.no { color: #a32d2d; }
+  .nav { display: flex; justify-content: flex-end; margin-top: 1rem; }
+  .next-btn { background: #533AB7; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 500; cursor: pointer; display: none; font-family: inherit; }
+  .next-btn:hover { background: #3c3489; }
+  .score-card { background: #fff; border: 1px solid #e0ddd6; border-radius: 14px; padding: 2.5rem; text-align: center; }
+  .score-big { font-size: 52px; font-weight: 600; color: #533AB7; }
+  .score-pct { font-size: 16px; color: #999; margin-bottom: 0.5rem; }
+  .score-comment { font-size: 15px; color: #333; margin-bottom: 1.5rem; }
+  .restart { background: #533AB7; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .restart:hover { background: #3c3489; }
+  @media (max-width: 480px) { .options { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <h1>🎵 Vår ungdoms hits</h1>
+    <p>Nostalgiaquiz – musik från 90-tal &amp; tidigt 2000-tal</p>
+  </div>
+  <div class="progress-bg"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+  <div id="q-area"></div>
+</div>
+<script>
+const qs = [
+  { cat:"Artist", q:"Vilket band sjöng låten 'Smells Like Teen Spirit' (1991)?", opts:["Pearl Jam","Nirvana","Soundgarden","Alice in Chains"], ans:1, fact:"Låten kom 1991 och satte grunge på kartan." },
+  { cat:"Låttitel", q:"Vilken Robyn-singel från 1997 handlar om att bli dumpad men ändå klara sig?", opts:["Do You Know (What It Takes)","Show Me Love","Be Mine","Handle Me"], ans:0, fact:"Robyn debuterade internationellt med denna låt." },
+  { cat:"Vilket år?", q:"Vilket år släpptes Backstreet Boys megahit 'I Want It That Way'?", opts:["1997","1998","1999","2000"], ans:2, fact:"Låten kom 1999 och toppade listor världen över." },
+  { cat:"Artist", q:"Vem sjöng 'Hit Me Baby One More Time' när hon debuterade 1998?", opts:["Christina Aguilera","Mandy Moore","Britney Spears","Jessica Simpson"], ans:2, fact:"Britney Spears var 16 år när låten gavs ut." },
+  { cat:"Band", q:"Vilket svenskt band hade hits som 'The Sign' och 'All That She Wants'?", opts:["Roxette","Ace of Base","Army of Lovers","E-Type"], ans:1, fact:"Ace of Base sålde över 30 miljoner album globalt." },
+  { cat:"Låttitel", q:"Vilken Eminem-låt från 2002 handlar om att ta en chans och leva ut sin dröm?", opts:["Lose Yourself","Without Me","Cleanin' Out My Closet","Sing for the Moment"], ans:0, fact:"Låten vann en Oscar för bästa originallåt." },
+  { cat:"Vilket år?", q:"Vilket år kom Destiny's Childs 'Bootylicious'?", opts:["1999","2000","2001","2002"], ans:2, fact:"Låten kom 2001 från albumet 'Survivor'." },
+  { cat:"Artist", q:"Vem sjöng 'Genie in a Bottle' 1999?", opts:["Mariah Carey","Christina Aguilera","Jennifer Lopez","Aaliyah"], ans:1, fact:"Det var Christina Aguileras debutsingel." },
+  { cat:"Band", q:"Vilket brittiskt band sjöng 'Wonderwall' (1995)?", opts:["Blur","Pulp","Oasis","Suede"], ans:2, fact:"Låten är en av 90-talets mest igenkända ballader." },
+  { cat:"Låttitel", q:"Vilken dansant låt med fem tjejnamn i refrängen toppade listorna 1999?", opts:["La Vida Loca","Mambo No. 5","Maria Maria","Bailamos"], ans:1, fact:"Lou Bega mixade in fem tjejnamn i refrängen." },
+  { cat:"Vilket år?", q:"När kom Linkin Parks debutalbum 'Hybrid Theory'?", opts:["1999","2000","2001","2002"], ans:1, fact:"Albumet sålde i över 30 miljoner exemplar." },
+  { cat:"Artist", q:"Vem hade hiten 'Believe' med tydlig vocoder-effekt 1998?", opts:["Whitney Houston","Cher","Celine Dion","Madonna"], ans:1, fact:"Cher populariserade auto-tune/vocoder i mainstreammusik." },
+  { cat:"Band", q:"Vilket band hade 'Yellow', 'The Scientist' och 'Clocks' i början av 2000-talet?", opts:["Travis","Radiohead","Coldplay","Keane"], ans:2, fact:"Coldplay debuterade med albumet 'Parachute' år 2000." },
+  { cat:"Låttitel", q:"Vilken låt av Aqua (1997) handlar om en ikonisk plastdocka?", opts:["Doctor Jones","Barbie Girl","Candyman","Lollipop"], ans:1, fact:"Barbie Girl blev Aquas internationella genombrott." },
+  { cat:"Vilket år?", q:"Vilket år gav Nelly Furtado ut debuten med hiten 'I'm Like a Bird'?", opts:["1999","2000","2001","2002"], ans:2, fact:"'I'm Like a Bird' vann en Grammy 2002." }
+];
+
+let cur=0, score=0, answered=false;
+
+function render() {
+  const area = document.getElementById('q-area');
+  if (cur >= qs.length) { showResult(area); return; }
+  const q = qs[cur];
+  document.getElementById('prog').style.width = Math.round((cur/qs.length)*100)+'%';
+  area.innerHTML = `
+    <div class="card">
+      <span class="cat-tag">${q.cat}</span>
+      <div class="q-meta">Fråga ${cur+1} av ${qs.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="opts">
+        ${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${'ABCD'[i]}. ${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="fb"></div>
+    </div>
+    <div class="nav"><button class="next-btn" id="nxt" onclick="next()">${cur<qs.length-1?'Nästa fråga':'Se resultat'} →</button></div>`;
+  answered=false;
+}
+
+function pick(i) {
+  if (answered) return;
+  answered=true;
+  const q=qs[cur];
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fb');
+  if (i===q.ans) {
+    document.querySelectorAll('.opt')[i].classList.add('correct');
+    fb.textContent='Rätt! '+q.fact; fb.className='feedback ok'; score++;
+  } else {
+    document.querySelectorAll('.opt')[i].classList.add('wrong');
+    document.querySelectorAll('.opt')[q.ans].classList.add('reveal');
+    fb.textContent='Fel – rätt svar: '+q.opts[q.ans]+'. '+q.fact; fb.className='feedback no';
+  }
+  document.getElementById('nxt').style.display='block';
+}
+
+function next() { cur++; render(); }
+
+function showResult(area) {
+  document.getElementById('prog').style.width='100%';
+  const pct=Math.round((score/qs.length)*100);
+  const comments=['Inga bekymmer, det är ju det som är kul med ett quiz!','Halvbra – men man kan inte minnas allt man gömt undan.','Starkt! Nostalgin sitter verkligen i.','Imponerande! Du var tydligen väldigt vaken på 90-talet.'];
+  const c = pct>=90?3:pct>=70?2:pct>=50?1:0;
+  area.innerHTML=`<div class="score-card"><div class="score-big">${score}/${qs.length}</div><div class="score-pct">${pct}% rätt</div><div class="score-comment">${comments[c]}</div><button class="restart" onclick="restart()">Kör en gång till</button></div>`;
+}
+
+function restart() { cur=0; score=0; answered=false; render(); }
+render();
+</script>
+</body>
+</html>
