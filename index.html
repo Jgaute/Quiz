@@ -3,120 +3,256 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vår ungdoms hits – Nostalgiaquiz</title>
+<title>Filmquiz</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: system-ui, -apple-system, sans-serif; background: #f5f4f0; color: #1a1a1a; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
-  #app { width: 100%; max-width: 640px; }
-  .header { text-align: center; margin-bottom: 2rem; }
-  .header h1 { font-size: 26px; font-weight: 600; margin-bottom: 4px; }
-  .header p { font-size: 14px; color: #666; }
-  .progress-bg { background: #e0ddd6; border-radius: 99px; height: 6px; margin-bottom: 1.5rem; }
-  .progress-fill { background: #533AB7; height: 6px; border-radius: 99px; transition: width 0.4s ease; }
-  .card { background: #fff; border: 1px solid #e0ddd6; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
-  .cat-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #f0eee8; color: #666; border: 1px solid #e0ddd6; margin-bottom: 6px; }
-  .q-meta { font-size: 12px; color: #999; margin-bottom: 6px; }
-  .q-text { font-size: 17px; font-weight: 500; line-height: 1.5; margin-bottom: 1.25rem; }
-  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .opt { background: #f5f4f0; border: 1px solid #e0ddd6; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #1a1a1a; cursor: pointer; text-align: left; line-height: 1.4; transition: background 0.15s, border-color 0.15s; font-family: inherit; }
-  .opt:hover:not(:disabled) { background: #eceae4; border-color: #ccc; }
-  .opt.correct { background: #eaf3de; border-color: #639922; color: #27500a; }
-  .opt.wrong { background: #fcebeb; border-color: #a32d2d; color: #501313; }
-  .opt.reveal { background: #eaf3de; border-color: #639922; color: #27500a; }
-  .opt:disabled { cursor: default; }
-  .feedback { font-size: 13px; margin-top: 10px; min-height: 18px; color: #666; line-height: 1.5; }
-  .feedback.ok { color: #3b6d11; }
-  .feedback.no { color: #a32d2d; }
-  .nav { display: flex; justify-content: flex-end; margin-top: 1rem; }
-  .next-btn { background: #533AB7; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 500; cursor: pointer; display: none; font-family: inherit; }
-  .next-btn:hover { background: #3c3489; }
-  .score-card { background: #fff; border: 1px solid #e0ddd6; border-radius: 14px; padding: 2.5rem; text-align: center; }
-  .score-big { font-size: 52px; font-weight: 600; color: #533AB7; }
-  .score-pct { font-size: 16px; color: #999; margin-bottom: 0.5rem; }
-  .score-comment { font-size: 15px; color: #333; margin-bottom: 1.5rem; }
-  .restart { background: #533AB7; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; }
-  .restart:hover { background: #3c3489; }
-  @media (max-width: 480px) { .options { grid-template-columns: 1fr; } }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#111;min-height:100vh;display:flex;justify-content:center;padding:2rem 1rem}
+@media(prefers-color-scheme:dark){body{background:#111;color:#eee}}
+.qz{max-width:560px;width:100%}
+h1{font-size:22px;font-weight:500;margin-bottom:0.25rem}
+.sub{font-size:13px;color:#666;margin-bottom:1.5rem}
+@media(prefers-color-scheme:dark){.sub{color:#999}}
+.progress-bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+@media(prefers-color-scheme:dark){.progress-bar{background:#333}}
+.progress-fill{height:100%;background:#378ADD;border-radius:2px;transition:width 0.3s}
+.qlabel{font-size:12px;font-weight:500;color:#888;letter-spacing:0.05em;margin-bottom:0.75rem}
+.poster-wrap{width:180px;border-radius:12px;overflow:hidden;border:0.5px solid #ddd;margin-bottom:1rem}
+@media(prefers-color-scheme:dark){.poster-wrap{border-color:#333}}
+.poster-wrap svg{display:block}
+.clues{font-size:13px;color:#666;margin-bottom:1rem;line-height:1.8}
+@media(prefers-color-scheme:dark){.clues{color:#999}}
+.clues b{color:#111;font-weight:500}
+@media(prefers-color-scheme:dark){.clues b{color:#eee}}
+.timer-bar{height:5px;background:#e0e0e0;border-radius:3px;margin-bottom:1rem;overflow:hidden}
+@media(prefers-color-scheme:dark){.timer-bar{background:#333}}
+.timer-fill{height:100%;border-radius:3px;transition:width 1s linear,background 1s}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:400px}
+.opt{background:#fff;border:0.5px solid #ccc;border-radius:8px;padding:10px 14px;font-size:14px;color:#111;cursor:pointer;text-align:left}
+@media(prefers-color-scheme:dark){.opt{background:#1a1a1a;border-color:#444;color:#eee}}
+.opt:hover:not(:disabled){background:#f5f5f5}
+@media(prefers-color-scheme:dark){.opt:hover:not(:disabled){background:#2a2a2a}}
+.opt.ok{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.no{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.show{background:#d4edda;border-color:#28a745;color:#155724;opacity:0.55}
+.fb{font-size:14px;font-weight:500;min-height:22px;margin-top:0.6rem}
+.fb.ok{color:#28a745}
+.fb.no{color:#dc3545}
+.fb.out{color:#856404}
+.nav{margin-top:1.25rem}
+.nav button{background:#fff;border:0.5px solid #ccc;border-radius:8px;padding:10px 22px;font-size:14px;color:#111;cursor:pointer}
+@media(prefers-color-scheme:dark){.nav button{background:#1a1a1a;border-color:#444;color:#eee}}
+.nav button:hover{background:#f5f5f5}
+@media(prefers-color-scheme:dark){.nav button:hover{background:#2a2a2a}}
+.score-row{font-size:13px;color:#666;margin-bottom:1rem}
+@media(prefers-color-scheme:dark){.score-row{color:#999}}
+.score-row b{color:#111}
+@media(prefers-color-scheme:dark){.score-row b{color:#eee}}
+.result{text-align:center;padding:2rem 0}
+.result .big{font-size:48px;font-weight:500}
+.result .msg{font-size:16px;color:#666;margin-top:0.5rem}
+@media(prefers-color-scheme:dark){.result .msg{color:#999}}
+.result .restart{margin-top:1.5rem;background:#fff;border:0.5px solid #ccc;border-radius:8px;padding:10px 24px;font-size:14px;cursor:pointer;color:#111}
+@media(prefers-color-scheme:dark){.result .restart{background:#1a1a1a;border-color:#444;color:#eee}}
+.result .restart:hover{background:#f5f5f5}
+@media(prefers-color-scheme:dark){.result .restart:hover{background:#2a2a2a}}
+.splash{display:flex;flex-direction:column;align-items:center;text-align:center;padding:1rem 0 2rem}
+.splash svg{width:100%;max-width:420px;border-radius:16px;overflow:hidden;margin-bottom:1.75rem;border:0.5px solid #ddd}
+@media(prefers-color-scheme:dark){.splash svg{border-color:#333}}
+.splash h2{font-size:24px;font-weight:500;margin-bottom:1rem;line-height:1.3}
+.splash p{font-size:14px;color:#555;line-height:1.75;max-width:380px;margin-bottom:1.75rem}
+@media(prefers-color-scheme:dark){.splash p{color:#aaa}}
+.splash-btn{background:#111;color:#fff;border:none;border-radius:10px;padding:13px 32px;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.15s}
+.splash-btn:hover{opacity:0.85}
+@media(prefers-color-scheme:dark){.splash-btn{background:#eee;color:#111}}
 </style>
 </head>
 <body>
-<div id="app">
-  <div class="header">
-    <h1>🎵 Vår ungdoms hits</h1>
-    <p>Nostalgiaquiz – musik från 90-tal &amp; tidigt 2000-tal</p>
-  </div>
-  <div class="progress-bg"><div class="progress-fill" id="prog" style="width:0%"></div></div>
-  <div id="q-area"></div>
-</div>
+<div class="qz" id="app"></div>
 <script>
-const qs = [
-  { cat:"Artist", q:"Vilket band sjöng låten 'Smells Like Teen Spirit' (1991)?", opts:["Pearl Jam","Nirvana","Soundgarden","Alice in Chains"], ans:1, fact:"Låten kom 1991 och satte grunge på kartan." },
-  { cat:"Låttitel", q:"Vilken Robyn-singel från 1997 handlar om att bli dumpad men ändå klara sig?", opts:["Do You Know (What It Takes)","Show Me Love","Be Mine","Handle Me"], ans:0, fact:"Robyn debuterade internationellt med denna låt." },
-  { cat:"Vilket år?", q:"Vilket år släpptes Backstreet Boys megahit 'I Want It That Way'?", opts:["1997","1998","1999","2000"], ans:2, fact:"Låten kom 1999 och toppade listor världen över." },
-  { cat:"Artist", q:"Vem sjöng 'Hit Me Baby One More Time' när hon debuterade 1998?", opts:["Christina Aguilera","Mandy Moore","Britney Spears","Jessica Simpson"], ans:2, fact:"Britney Spears var 16 år när låten gavs ut." },
-  { cat:"Band", q:"Vilket svenskt band hade hits som 'The Sign' och 'All That She Wants'?", opts:["Roxette","Ace of Base","Army of Lovers","E-Type"], ans:1, fact:"Ace of Base sålde över 30 miljoner album globalt." },
-  { cat:"Låttitel", q:"Vilken Eminem-låt från 2002 handlar om att ta en chans och leva ut sin dröm?", opts:["Lose Yourself","Without Me","Cleanin' Out My Closet","Sing for the Moment"], ans:0, fact:"Låten vann en Oscar för bästa originallåt." },
-  { cat:"Vilket år?", q:"Vilket år kom Destiny's Childs 'Bootylicious'?", opts:["1999","2000","2001","2002"], ans:2, fact:"Låten kom 2001 från albumet 'Survivor'." },
-  { cat:"Artist", q:"Vem sjöng 'Genie in a Bottle' 1999?", opts:["Mariah Carey","Christina Aguilera","Jennifer Lopez","Aaliyah"], ans:1, fact:"Det var Christina Aguileras debutsingel." },
-  { cat:"Band", q:"Vilket brittiskt band sjöng 'Wonderwall' (1995)?", opts:["Blur","Pulp","Oasis","Suede"], ans:2, fact:"Låten är en av 90-talets mest igenkända ballader." },
-  { cat:"Låttitel", q:"Vilken dansant låt med fem tjejnamn i refrängen toppade listorna 1999?", opts:["La Vida Loca","Mambo No. 5","Maria Maria","Bailamos"], ans:1, fact:"Lou Bega mixade in fem tjejnamn i refrängen." },
-  { cat:"Vilket år?", q:"När kom Linkin Parks debutalbum 'Hybrid Theory'?", opts:["1999","2000","2001","2002"], ans:1, fact:"Albumet sålde i över 30 miljoner exemplar." },
-  { cat:"Artist", q:"Vem hade hiten 'Believe' med tydlig vocoder-effekt 1998?", opts:["Whitney Houston","Cher","Celine Dion","Madonna"], ans:1, fact:"Cher populariserade auto-tune/vocoder i mainstreammusik." },
-  { cat:"Band", q:"Vilket band hade 'Yellow', 'The Scientist' och 'Clocks' i början av 2000-talet?", opts:["Travis","Radiohead","Coldplay","Keane"], ans:2, fact:"Coldplay debuterade med albumet 'Parachute' år 2000." },
-  { cat:"Låttitel", q:"Vilken låt av Aqua (1997) handlar om en ikonisk plastdocka?", opts:["Doctor Jones","Barbie Girl","Candyman","Lollipop"], ans:1, fact:"Barbie Girl blev Aquas internationella genombrott." },
-  { cat:"Vilket år?", q:"Vilket år gav Nelly Furtado ut debuten med hiten 'I'm Like a Bird'?", opts:["1999","2000","2001","2002"], ans:2, fact:"'I'm Like a Bird' vann en Grammy 2002." }
+const QS=[
+  {title:"The Lion King",answer:2,clues:["Regisserad av Roger Allers & Rob Minkoff"],opts:["Tarzan","Aladdin","The Lion King","Bambi"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#c8860a"/><rect x="0" y="0" width="180" height="100" fill="#e8a020"/><circle cx="90" cy="38" r="28" fill="#f5c842"/><polygon points="90,10 95,25 110,25 98,34 103,49 90,40 77,49 82,34 70,25 85,25" fill="#f0a500"/><rect x="0" y="100" width="180" height="170" fill="#8B4513"/><ellipse cx="90" cy="155" rx="38" ry="28" fill="#c8860a"/><circle cx="90" cy="136" r="22" fill="#d4a050"/><ellipse cx="90" cy="138" rx="14" ry="10" fill="#b8822a"/><circle cx="84" cy="133" r="3" fill="#3a2010"/><circle cx="96" cy="133" r="3" fill="#3a2010"/><ellipse cx="90" cy="141" rx="6" ry="3" fill="#c07840"/><rect x="50" y="155" width="80" height="55" fill="#a06820"/><polygon points="60,210 120,210 130,240 50,240" fill="#8B4513"/><rect x="30" y="165" width="14" height="45" fill="#a06820"/><rect x="136" y="165" width="14" height="45" fill="#a06820"/><ellipse cx="40" cy="200" rx="12" ry="6" fill="#7a5010"/><ellipse cx="140" cy="200" rx="12" ry="6" fill="#7a5010"/><rect x="0" y="240" width="180" height="30" fill="#1a0a00"/><rect x="20" y="248" width="140" height="12" fill="#2a1000" rx="2"/><text x="90" y="258" text-anchor="middle" fill="#5a3010" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`},
+  {title:"Jurassic Park",answer:0,clues:["Släpptes 1993"],opts:["Jurassic Park","King Kong","Godzilla","The Lost World"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#0a1a0a"/><rect x="0" y="0" width="180" height="130" fill="#0d2010"/><rect x="0" y="60" width="180" height="80" fill="#0f2810"/><ellipse cx="90" cy="120" rx="80" ry="60" fill="#1a3a18"/><rect x="60" y="80" width="8" height="60" fill="#2a5a20"/><rect x="80" y="60" width="8" height="80" fill="#2a5a20"/><rect x="100" y="70" width="8" height="75" fill="#2a5a20"/><rect x="120" y="85" width="8" height="55" fill="#2a5a20"/><rect x="40" y="90" width="8" height="50" fill="#2a5a20"/><ellipse cx="62" cy="78" rx="14" ry="10" fill="#1e4a18"/><ellipse cx="84" cy="58" rx="12" ry="9" fill="#1e4a18"/><ellipse cx="104" cy="68" rx="13" ry="9" fill="#1e4a18"/><ellipse cx="124" cy="83" rx="12" ry="8" fill="#1e4a18"/><ellipse cx="44" cy="88" rx="11" ry="8" fill="#1e4a18"/><rect x="0" y="130" width="180" height="20" fill="#0a0f0a"/><path d="M30,130 Q50,100 70,115 Q90,90 110,110 Q130,95 150,130" fill="none" stroke="#3a7a30" stroke-width="2"/><circle cx="90" cy="72" r="12" fill="#1a3818"/><circle cx="86" cy="70" r="3" fill="#c8e040" opacity="0.9"/><circle cx="94" cy="70" r="3" fill="#c8e040" opacity="0.9"/><rect x="0" y="218" width="180" height="52" fill="#050c05"/><rect x="15" y="228" width="150" height="16" fill="#0a1a08" rx="2"/><text x="90" y="240" text-anchor="middle" fill="#1a3a10" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`},
+  {title:"Home Alone",answer:1,clues:["Regisserad av Chris Columbus"],opts:["Dennis the Menace","Home Alone","Richie Rich","The Little Rascals"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#1a0a2a"/><rect x="0" y="0" width="180" height="60" fill="#0d0518"/><circle cx="20" cy="15" r="2" fill="#fff8e0"/><circle cx="45" cy="8" r="1.5" fill="#fff8e0"/><circle cx="70" cy="20" r="2" fill="#fff8e0"/><circle cx="110" cy="10" r="1.5" fill="#fff8e0"/><circle cx="145" cy="18" r="2" fill="#fff8e0"/><circle cx="165" cy="5" r="1.5" fill="#fff8e0"/><polygon points="90,30 30,100 150,100" fill="#3a2a50"/><polygon points="30,100 150,100 160,270 20,270" fill="#4a3860"/><rect x="55" y="130" width="70" height="90" fill="#2a1a3a"/><rect x="70" y="130" width="12" height="35" fill="#c8a830"/><rect x="98" y="130" width="12" height="35" fill="#c8a830"/><rect x="70" y="175" width="40" height="45" fill="#1a0a2a"/><circle cx="107" cy="196" r="3" fill="#c0a020"/><rect x="40" y="150" width="20" height="28" fill="#2a1a3a"/><rect x="120" y="150" width="20" height="28" fill="#2a1a3a"/><rect x="43" y="153" width="14" height="22" fill="#c8a830" opacity="0.3"/><rect x="123" y="153" width="14" height="22" fill="#c8a830" opacity="0.3"/><rect x="78" y="80" width="24" height="22" fill="#5a4870"/><circle cx="78" cy="115" r="8" fill="#f5c080"/><circle cx="78" cy="110" r="6" fill="#d4945a"/><circle cx="74" cy="109" r="2" fill="#2a1800"/><circle cx="82" cy="109" r="2" fill="#2a1800"/><ellipse cx="78" cy="113" rx="4" ry="2" fill="#c07048"/><rect x="60" y="116" width="36" height="10" fill="#cc2020"/><rect x="0" y="238" width="180" height="32" fill="#050510"/><text x="90" y="252" text-anchor="middle" fill="#202030" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`},
+  {title:"Titanic",answer:3,clues:["Släpptes 1997"],opts:["The Poseidon Adventure","Speed","Cast Away","Titanic"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#04101e"/><rect x="0" y="0" width="180" height="90" fill="#060c18"/><circle cx="140" cy="22" r="12" fill="#f0e880" opacity="0.8"/><circle cx="140" cy="22" r="8" fill="#f8f060"/><circle cx="30" cy="15" r="1.5" fill="#e8e8ff"/><circle cx="55" cy="30" r="1" fill="#e8e8ff"/><circle cx="15" cy="40" r="1.5" fill="#e8e8ff"/><circle cx="80" cy="8" r="1" fill="#e8e8ff"/><rect x="0" y="55" width="180" height="215" fill="#05101e"/><rect x="10" y="118" width="160" height="45" fill="#0a2040"/><polygon points="10,118 170,118 175,130 5,130" fill="#0c2848"/><rect x="30" y="80" width="8" height="40" fill="#0c2240"/><rect x="55" y="72" width="8" height="48" fill="#0c2240"/><rect x="118" y="72" width="8" height="48" fill="#0c2240"/><rect x="143" y="80" width="8" height="40" fill="#0c2240"/><rect x="20" y="130" width="20" height="33" fill="#0a1e38"/><rect x="50" y="125" width="20" height="38" fill="#0a1e38"/><rect x="80" y="122" width="20" height="41" fill="#0a1e38"/><rect x="110" y="125" width="20" height="38" fill="#0a1e38"/><rect x="140" y="130" width="20" height="33" fill="#0a1e38"/><polygon points="0,163 180,163 190,200 -10,200" fill="#081830"/><rect x="0" y="242" width="180" height="28" fill="#020610"/><text x="90" y="256" text-anchor="middle" fill="#0c1828" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`},
+  {title:"The Matrix",answer:2,clues:["Regisserad av Lana & Lilly Wachowski"],opts:["Blade Runner","Ghost in the Shell","The Matrix","Tron"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#010d01"/><text x="12" y="18" fill="#00aa00" font-size="9" opacity="0.7" font-family="monospace">01101</text><text x="40" y="30" fill="#00aa00" font-size="9" opacity="0.5" font-family="monospace">10010</text><text x="80" y="14" fill="#00aa00" font-size="9" opacity="0.6" font-family="monospace">11001</text><text x="120" y="22" fill="#00aa00" font-size="9" opacity="0.4" font-family="monospace">01110</text><text x="155" y="16" fill="#00aa00" font-size="9" opacity="0.7" font-family="monospace">10</text><text x="5" y="45" fill="#004400" font-size="8" opacity="0.5" font-family="monospace">110010</text><text x="65" y="52" fill="#004400" font-size="8" opacity="0.4" font-family="monospace">010011</text><circle cx="90" cy="120" r="45" fill="#020f02"/><rect x="55" y="80" width="70" height="85" fill="#020f02" rx="4"/><rect x="58" y="83" width="64" height="79" fill="#030f03" rx="3"/><circle cx="78" cy="108" r="7" fill="#010801"/><circle cx="102" cy="108" r="7" fill="#010801"/><rect x="70" y="104" width="8" height="4" fill="#00cc00" rx="1"/><rect x="102" y="104" width="8" height="4" fill="#00cc00" rx="1"/><rect x="72" y="100" width="4" height="8" fill="#00cc00" rx="1"/><rect x="104" y="100" width="4" height="8" fill="#00cc00" rx="1"/><rect x="69" y="118" width="42" height="3" fill="#006600" rx="1"/><rect x="74" y="123" width="32" height="3" fill="#005500" rx="1"/><rect x="75" y="152" width="30" height="8" fill="#003300" rx="1"/><text x="90" y="158" text-anchor="middle" fill="#00aa00" font-size="8" font-family="monospace">AGENT</text><text x="8" y="185" fill="#003300" font-size="8" opacity="0.8" font-family="monospace">010101</text><text x="60" y="195" fill="#003300" font-size="8" opacity="0.6" font-family="monospace">110010</text><text x="120" y="188" fill="#003300" font-size="8" opacity="0.7" font-family="monospace">01011</text><rect x="0" y="228" width="180" height="42" fill="#000c00"/><text x="90" y="248" text-anchor="middle" fill="#004400" font-size="10" letter-spacing="3" font-family="monospace">▬▬▬▬▬</text></svg>`},
+  {title:"Forrest Gump",answer:0,clues:["Släpptes 1994"],opts:["Forrest Gump","Big","Cast Away","Philadelphia"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#87CEEB"/><rect x="0" y="0" width="180" height="130" fill="#87CEEB"/><ellipse cx="50" cy="40" rx="30" ry="16" fill="#ffffff" opacity="0.8"/><ellipse cx="130" cy="55" rx="22" ry="12" fill="#ffffff" opacity="0.7"/><rect x="0" y="130" width="180" height="140" fill="#3a7a20"/><rect x="0" y="160" width="180" height="110" fill="#2a6010"/><rect x="60" y="130" width="60" height="140" fill="#c8b870"/><rect x="68" y="130" width="44" height="140" fill="#d4c480"/><circle cx="90" cy="110" r="12" fill="#f0d090"/><rect x="82" y="122" width="16" height="28" fill="#3060a0"/><rect x="76" y="148" width="12" height="30" fill="#3a3a3a"/><rect x="92" y="148" width="12" height="30" fill="#3a3a3a"/><rect x="74" y="175" width="14" height="8" fill="#f0d090"/><rect x="92" y="177" width="14" height="8" fill="#f0d090"/><rect x="72" y="182" width="16" height="6" fill="#ffffff"/><rect x="92" y="183" width="14" height="6" fill="#ffffff"/><ellipse cx="90" cy="107" rx="8" ry="5" fill="#c8a070"/><rect x="0" y="238" width="180" height="32" fill="#183808"/><text x="90" y="252" text-anchor="middle" fill="#0a2004" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`},
+  {title:"The Silence of the Lambs",answer:1,clues:["Regisserad av Jonathan Demme"],opts:["Se7en","The Silence of the Lambs","Zodiac","Manhunter"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#0f0c08"/><circle cx="90" cy="80" r="50" fill="#181410"/><ellipse cx="90" cy="78" rx="30" ry="35" fill="#e8c898"/><ellipse cx="90" cy="72" rx="22" ry="18" fill="#d4b070"/><circle cx="82" cy="68" r="4" fill="#2a1a10"/><circle cx="98" cy="68" r="4" fill="#2a1a10"/><rect x="82" y="78" width="16" height="3" fill="#c09860" rx="1"/><ellipse cx="90" cy="84" rx="10" ry="5" fill="#c89858"/><ellipse cx="90" cy="55" rx="24" ry="12" fill="#8a6840"/><path d="M60,125 Q90,115 120,125 L125,200 L55,200 Z" fill="#d4c0a0" opacity="0.9"/><rect x="65" y="125" width="50" height="80" fill="#c0aa88"/><rect x="55" y="200" width="70" height="70" fill="#181410"/><rect x="75" y="100" width="30" height="5" fill="#e8e8e8" rx="2" opacity="0.8"/><rect x="72" y="106" width="36" height="4" fill="#c0c0c0" rx="2" opacity="0.8"/><rect x="0" y="238" width="180" height="32" fill="#060402"/><text x="90" y="252" text-anchor="middle" fill="#1a1410" font-size="10" letter-spacing="2">▬▬▬▬▬▬▬</text></svg>`},
+  {title:"Back to the Future",answer:3,clues:["Släpptes 1985"],opts:["Bill & Ted's Excellent Adventure","Tron","Terminator","Back to the Future"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#060818"/><rect x="0" y="0" width="180" height="180" fill="#080a20"/><circle cx="90" cy="50" r="6" fill="#fffff0" opacity="0.9"/><circle cx="30" cy="20" r="2" fill="#e0e8ff"/><circle cx="140" cy="15" r="2" fill="#e0e8ff"/><circle cx="165" cy="40" r="1.5" fill="#e0e8ff"/><path d="M20,155 Q45,125 70,138 Q90,118 110,135 Q135,120 160,150" fill="none" stroke="#3050d0" stroke-width="2.5" opacity="0.8"/><path d="M20,160 Q45,130 70,143 Q90,123 110,140 Q135,125 160,155" fill="none" stroke="#4060e0" stroke-width="1.5" opacity="0.6"/><rect x="25" y="130" width="130" height="55" fill="#1a1a2a" rx="8"/><rect x="28" y="133" width="124" height="49" fill="#1c1e30" rx="6"/><ellipse cx="52" cy="145" rx="16" ry="10" fill="#2a2a40"/><ellipse cx="128" cy="145" rx="16" ry="10" fill="#2a2a40"/><rect x="68" y="135" width="44" height="24" fill="#242438" rx="3"/><rect x="70" y="137" width="40" height="20" fill="#141428" rx="2"/><rect x="40" y="155" width="18" height="24" fill="#1a1a2a" rx="2"/><rect x="122" y="155" width="18" height="24" fill="#1a1a2a" rx="2"/><ellipse cx="49" cy="179" rx="9" ry="4" fill="#282840"/><ellipse cx="131" cy="179" rx="9" ry="4" fill="#282840"/><rect x="0" y="238" width="180" height="32" fill="#030408"/><text x="90" y="252" text-anchor="middle" fill="#0c1030" font-size="10" letter-spacing="2">▬▬▬▬▬▬▬</text></svg>`},
+  {title:"The Dark Knight",answer:2,clues:["Regisserad av Christopher Nolan"],opts:["Batman Begins","Superman Returns","The Dark Knight","Iron Man"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#050508"/><rect x="10" y="85" width="25" height="85" fill="#0e0e18"/><rect x="12" y="88" width="21" height="12" fill="#181828" rx="1"/><rect x="12" y="103" width="21" height="12" fill="#181828" rx="1"/><rect x="12" y="118" width="21" height="12" fill="#181828" rx="1"/><rect x="40" y="95" width="18" height="75" fill="#0e0e18"/><rect x="42" y="98" width="14" height="10" fill="#181828" rx="1"/><rect x="42" y="111" width="14" height="10" fill="#c8a020" opacity="0.4" rx="1"/><rect x="62" y="75" width="30" height="105" fill="#0e0e18"/><rect x="64" y="78" width="26" height="14" fill="#181828" rx="1"/><rect x="64" y="112" width="26" height="14" fill="#c8a020" opacity="0.5" rx="1"/><rect x="100" y="85" width="25" height="85" fill="#0e0e18"/><rect x="133" y="95" width="18" height="75" fill="#0e0e18"/><rect x="135" y="137" width="14" height="10" fill="#c8a020" opacity="0.4" rx="1"/><rect x="155" y="88" width="20" height="82" fill="#0e0e18"/><path d="M62,168 L90,145 L118,168 L112,168 L90,150 L68,168 Z" fill="#101018"/><path d="M55,168 L90,138 L125,168" fill="none" stroke="#1a1a28" stroke-width="1.5"/><rect x="0" y="238" width="180" height="32" fill="#020204"/><text x="90" y="252" text-anchor="middle" fill="#0e0e18" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`},
+  {title:"Pulp Fiction",answer:0,clues:["Släpptes 1994"],opts:["Pulp Fiction","Reservoir Dogs","Kill Bill","Jackie Brown"],svg:`<svg viewBox="0 0 180 270" xmlns="http://www.w3.org/2000/svg" width="180"><rect width="180" height="270" fill="#c8b020"/><rect x="0" y="0" width="180" height="50" fill="#b0a018"/><rect x="0" y="220" width="180" height="50" fill="#a89010"/><circle cx="90" cy="115" r="50" fill="#c8b020"/><rect x="50" y="75" width="80" height="85" fill="#b0a018" rx="4"/><rect x="53" y="78" width="74" height="79" fill="#d0b828" rx="3"/><circle cx="78" cy="100" r="4" fill="#3a3010"/><circle cx="102" cy="100" r="4" fill="#3a3010"/><rect x="74" y="108" width="32" height="3" fill="#8a7808" rx="1"/><rect x="78" y="113" width="24" height="3" fill="#8a7808" rx="1"/><rect x="64" y="125" width="52" height="30" fill="#b0a018"/><rect x="66" y="127" width="48" height="26" fill="#c0b020" rx="2"/><rect x="74" y="130" width="12" height="20" fill="#a89018" rx="1"/><rect x="94" y="130" width="12" height="20" fill="#a89018" rx="1"/><rect x="55" y="172" width="70" height="28" fill="#b8a820" rx="2"/><rect x="0" y="238" width="180" height="32" fill="#282000"/><text x="90" y="252" text-anchor="middle" fill="#403800" font-size="10" letter-spacing="3">▬▬▬▬▬▬</text></svg>`}
 ];
 
-let cur=0, score=0, answered=false;
+let cur=0,score=0,timer=null,timeLeft=20;
 
-function render() {
-  const area = document.getElementById('q-area');
-  if (cur >= qs.length) { showResult(area); return; }
-  const q = qs[cur];
-  document.getElementById('prog').style.width = Math.round((cur/qs.length)*100)+'%';
-  area.innerHTML = `
-    <div class="card">
-      <span class="cat-tag">${q.cat}</span>
-      <div class="q-meta">Fråga ${cur+1} av ${qs.length}</div>
-      <div class="q-text">${q.q}</div>
-      <div class="options" id="opts">
-        ${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${'ABCD'[i]}. ${o}</button>`).join('')}
-      </div>
-      <div class="feedback" id="fb"></div>
-    </div>
-    <div class="nav"><button class="next-btn" id="nxt" onclick="next()">${cur<qs.length-1?'Nästa fråga':'Se resultat'} →</button></div>`;
-  answered=false;
+function renderQ(){
+  const q=QS[cur];
+  document.getElementById('qnum').textContent=cur+1;
+  document.getElementById('pts').textContent=score;
+  document.getElementById('prog').style.width=((cur+1)/10*100)+'%';
+  document.getElementById('qlabel').textContent='FRÅGA '+(cur+1)+' AV 10';
+  document.getElementById('poster').innerHTML=q.svg;
+  document.getElementById('clues').innerHTML='<b>'+q.clues[0]+'</b>';
+  const ob=document.getElementById('opts');
+  ob.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.textContent=o;
+    b.onclick=()=>pick(i);
+    ob.appendChild(b);
+  });
+  document.getElementById('fb').textContent='';
+  document.getElementById('fb').className='fb';
+  document.getElementById('nav').style.display='none';
+  startTimer();
 }
 
-function pick(i) {
-  if (answered) return;
-  answered=true;
-  const q=qs[cur];
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+function startTimer(){
+  timeLeft=20;
+  const bar=document.getElementById('tbar');
+  bar.style.transition='none';
+  bar.style.width='100%';
+  bar.style.background='#378ADD';
+  clearInterval(timer);
+  timer=setInterval(()=>{
+    timeLeft--;
+    const pct=Math.round(timeLeft/20*100);
+    bar.style.transition='width 1s linear,background 1s';
+    bar.style.width=pct+'%';
+    if(timeLeft<=8) bar.style.background='#E24B4A';
+    else if(timeLeft<=14) bar.style.background='#BA7517';
+    if(timeLeft<=0){clearInterval(timer);timeout();}
+  },1000);
+}
+
+function timeout(){
+  const q=QS[cur];
+  lockOpts(q.answer,-1);
   const fb=document.getElementById('fb');
-  if (i===q.ans) {
-    document.querySelectorAll('.opt')[i].classList.add('correct');
-    fb.textContent='Rätt! '+q.fact; fb.className='feedback ok'; score++;
+  fb.textContent='Tiden tog slut! Rätt svar: '+q.title;
+  fb.className='fb out';
+  document.getElementById('nav').style.display='block';
+}
+
+function pick(i){
+  clearInterval(timer);
+  const q=QS[cur];
+  lockOpts(q.answer,i);
+  const fb=document.getElementById('fb');
+  if(i===q.answer){
+    score++;
+    document.getElementById('pts').textContent=score;
+    fb.textContent='Rätt! Det är '+q.title+'!';
+    fb.className='fb ok';
   } else {
-    document.querySelectorAll('.opt')[i].classList.add('wrong');
-    document.querySelectorAll('.opt')[q.ans].classList.add('reveal');
-    fb.textContent='Fel – rätt svar: '+q.opts[q.ans]+'. '+q.fact; fb.className='feedback no';
+    fb.textContent='Fel. Rätt svar var: '+q.title;
+    fb.className='fb no';
   }
-  document.getElementById('nxt').style.display='block';
+  document.getElementById('nav').style.display='block';
 }
 
-function next() { cur++; render(); }
-
-function showResult(area) {
-  document.getElementById('prog').style.width='100%';
-  const pct=Math.round((score/qs.length)*100);
-  const comments=['Inga bekymmer, det är ju det som är kul med ett quiz!','Halvbra – men man kan inte minnas allt man gömt undan.','Starkt! Nostalgin sitter verkligen i.','Imponerande! Du var tydligen väldigt vaken på 90-talet.'];
-  const c = pct>=90?3:pct>=70?2:pct>=50?1:0;
-  area.innerHTML=`<div class="score-card"><div class="score-big">${score}/${qs.length}</div><div class="score-pct">${pct}% rätt</div><div class="score-comment">${comments[c]}</div><button class="restart" onclick="restart()">Kör en gång till</button></div>`;
+function lockOpts(correct,chosen){
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correct && chosen!==correct) b.classList.add('show');
+    if(i===chosen && chosen===correct) b.classList.add('ok');
+    if(i===chosen && chosen!==correct) b.classList.add('no');
+  });
 }
 
-function restart() { cur=0; score=0; answered=false; render(); }
-render();
+function nextQ(){
+  cur++;
+  if(cur>=QS.length){showEnd();return;}
+  renderQ();
+}
+
+
+function showEnd(){
+  const msgs=['Hoppas du lärde dig något nytt!','Inte illa alls!','Bra jobbat!','Imponerande filmkoll!','Perfekt! Du är ett filmnord!'];
+  const idx=Math.min(Math.floor(score/2),4);
+  document.getElementById('app').innerHTML='<div class="result"><div class="big">'+score+'/10</div><div class="msg">'+msgs[idx]+'</div><button class="restart" onclick="showSplash()">Spela igen</button></div>';
+}
+
+function showSplash(){
+  cur=0; score=0;
+  var svgHtml='<svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:420px;border-radius:16px;border:0.5px solid #ddd;margin-bottom:1.75rem;display:block">'
+    +'<rect width="420" height="220" fill="#0a0810"/>'
+    +'<polygon points="0,0 60,0 40,220 0,220" fill="#1a0a08" opacity="0.9"/>'
+    +'<polygon points="0,0 50,0 32,220 0,220" fill="#2a1008" opacity="0.7"/>'
+    +'<polygon points="420,0 360,0 380,220 420,220" fill="#1a0a08" opacity="0.9"/>'
+    +'<polygon points="420,0 370,0 388,220 420,220" fill="#2a1008" opacity="0.7"/>'
+    +'<rect x="55" y="18" width="310" height="170" rx="4" fill="#f5f0e8"/>'
+    +'<rect x="58" y="21" width="304" height="164" rx="3" fill="#f8f4ee"/>'
+    +'<ellipse cx="210" cy="103" rx="80" ry="55" fill="#fffdf8" opacity="0.6"/>'
+    +'<rect x="148" y="52" width="124" height="94" rx="5" fill="#1a1a1a"/>'
+    +'<rect x="151" y="68" width="118" height="75" rx="3" fill="#222"/>'
+    +'<rect x="148" y="52" width="124" height="18" rx="3" fill="#111"/>'
+    +'<polygon points="152,52 168,52 158,70 142,70" fill="#e8c84a"/>'
+    +'<polygon points="168,52 184,52 174,70 158,70" fill="#111"/>'
+    +'<polygon points="184,52 200,52 190,70 174,70" fill="#e8c84a"/>'
+    +'<polygon points="200,52 216,52 206,70 190,70" fill="#111"/>'
+    +'<polygon points="216,52 232,52 222,70 206,70" fill="#e8c84a"/>'
+    +'<polygon points="232,52 248,52 238,70 222,70" fill="#111"/>'
+    +'<polygon points="248,52 264,52 254,70 238,70" fill="#e8c84a"/>'
+    +'<polygon points="264,52 272,52 265,70 254,70" fill="#111"/>'
+    +'<rect x="158" y="75" width="104" height="12" rx="2" fill="#333"/>'
+    +'<rect x="158" y="91" width="84" height="12" rx="2" fill="#333"/>'
+    +'<rect x="158" y="107" width="94" height="12" rx="2" fill="#333"/>'
+    +'<rect x="158" y="123" width="74" height="10" rx="2" fill="#333"/>'
+    +'<circle cx="80" cy="48" r="22" fill="#111" stroke="#333" stroke-width="1.5"/>'
+    +'<circle cx="80" cy="48" r="14" fill="#1a1a1a"/>'
+    +'<circle cx="80" cy="48" r="5" fill="#333"/>'
+    +'<line x1="80" y1="34" x2="80" y2="48" stroke="#444" stroke-width="2"/>'
+    +'<line x1="80" y1="48" x2="94" y2="48" stroke="#444" stroke-width="2"/>'
+    +'<line x1="80" y1="48" x2="69" y2="57" stroke="#444" stroke-width="2"/>'
+    +'<circle cx="340" cy="48" r="22" fill="#111" stroke="#333" stroke-width="1.5"/>'
+    +'<circle cx="340" cy="48" r="14" fill="#1a1a1a"/>'
+    +'<circle cx="340" cy="48" r="5" fill="#333"/>'
+    +'<line x1="340" y1="34" x2="340" y2="48" stroke="#444" stroke-width="2"/>'
+    +'<line x1="340" y1="48" x2="354" y2="48" stroke="#444" stroke-width="2"/>'
+    +'<line x1="340" y1="48" x2="329" y2="57" stroke="#444" stroke-width="2"/>'
+    +'<rect x="20" y="188" width="18" height="22" rx="3" fill="#080608"/>'
+    +'<rect x="44" y="192" width="18" height="18" rx="3" fill="#080608"/>'
+    +'<rect x="68" y="190" width="18" height="20" rx="3" fill="#080608"/>'
+    +'<rect x="334" y="190" width="18" height="20" rx="3" fill="#080608"/>'
+    +'<rect x="358" y="192" width="18" height="18" rx="3" fill="#080608"/>'
+    +'<rect x="382" y="188" width="18" height="22" rx="3" fill="#080608"/>'
+    +'<ellipse cx="29" cy="185" rx="8" ry="7" fill="#080608"/>'
+    +'<ellipse cx="53" cy="189" rx="7" ry="6" fill="#080608"/>'
+    +'<ellipse cx="77" cy="187" rx="8" ry="7" fill="#080608"/>'
+    +'<ellipse cx="343" cy="187" rx="8" ry="7" fill="#080608"/>'
+    +'<ellipse cx="367" cy="189" rx="7" ry="6" fill="#080608"/>'
+    +'<ellipse cx="391" cy="185" rx="8" ry="7" fill="#080608"/>'
+    +'<text x="176" y="100" fill="#e8c84a" font-size="11" opacity="0.9">&#9733;</text>'
+    +'<text x="200" y="115" fill="#e8c84a" font-size="9" opacity="0.7">&#9733;</text>'
+    +'<text x="228" y="96" fill="#e8c84a" font-size="13" opacity="0.85">&#9733;</text>'
+    +'<text x="248" y="112" fill="#e8c84a" font-size="9" opacity="0.7">&#9733;</text>'
+    +'</svg>';
+  document.getElementById('app').innerHTML='<div class="splash">'+svgHtml
+    +'<h2>V&auml;lkommen till filmquiz!</h2>'
+    +'<p>Du kommer f&aring; se p&aring;hittade omslagsbilder f&ouml;r filmer och ska med hj&auml;lp av detta lista ut vilken film det g&auml;ller. Tiden du har p&aring; dig p&aring; varje fr&aring;ga &auml;r 20 sekunder.</p>'
+    +'<button class="splash-btn" onclick="startQuiz()">Starta quizen &rarr;</button>'
+    +'</div>';
+}
+
+function startQuiz(){
+  document.getElementById('app').innerHTML=''
+    +'<h1>Filmquiz</h1>'
+    +'<p class="sub">Gissa filmen fr&aring;n postern &mdash; 20 sekunder per fr&aring;ga</p>'
+    +'<div class="progress-bar"><div class="progress-fill" id="prog" style="width:10%"></div></div>'
+    +'<div class="score-row">Fr&aring;ga <b id="qnum">1</b> av 10 &nbsp;&middot;&nbsp; Po&auml;ng: <b id="pts">0</b></div>'
+    +'<div class="qlabel" id="qlabel">FR&Aring;GA 1 AV 10</div>'
+    +'<div class="poster-wrap" id="poster"></div>'
+    +'<div class="clues" id="clues"></div>'
+    +'<div class="timer-bar"><div class="timer-fill" id="tbar" style="width:100%;background:#378ADD"></div></div>'
+    +'<div class="opts" id="opts"></div>'
+    +'<div class="fb" id="fb"></div>'
+    +'<div class="nav" id="nav" style="display:none"><button onclick="nextQ()">N&auml;sta fr&aring;ga &rarr;</button></div>';
+  renderQ();
+}
+
+showSplash();
 </script>
 </body>
 </html>
