@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filmquiz</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg:#121016;
+  --bg-raised:#1b1720;
+  --gold:#E3B23C;
+  --velvet:#8B1E2B;
+  --plum:#4A3B5C;
+  --cream:#F2EDE4;
+  --cream-dim:#B8B0BE;
+  --good:#4E9C6E;
+  --bad:#B4453A;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  background:radial-gradient(circle at 50% -10%, #241f2e 0%, var(--bg) 55%);
+  color:var(--cream);
+  font-family:'Work Sans', sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  line-height:1.5;
+}
+
+.stage{
+  width:100%;
+  max-width:640px;
+}
+
+.marquee{
+  font-family:'Bebas Neue', sans-serif;
+  letter-spacing:0.04em;
+}
+
+/* ---------- Splash ---------- */
+#splash{
+  text-align:center;
+  padding:48px 24px;
+}
+#splash .lamp{
+  width:64px;
+  height:64px;
+  margin:0 auto 28px;
+}
+#splash h1{
+  font-size:clamp(48px, 12vw, 84px);
+  color:var(--gold);
+  text-shadow:0 0 24px rgba(227,178,60,0.35);
+  line-height:0.95;
+}
+#splash p{
+  color:var(--cream-dim);
+  margin-top:14px;
+  font-size:16px;
+}
+#splash .meta{
+  margin-top:6px;
+  font-size:14px;
+  color:var(--cream-dim);
+}
+#start-btn{
+  margin-top:36px;
+  background:var(--velvet);
+  color:var(--cream);
+  border:none;
+  padding:16px 40px;
+  font-family:'Bebas Neue', sans-serif;
+  font-size:22px;
+  letter-spacing:0.06em;
+  border-radius:2px;
+  cursor:pointer;
+  transition:transform 0.15s ease, background 0.15s ease;
+}
+#start-btn:hover{ background:#a4283a; transform:translateY(-1px); }
+#start-btn:active{ transform:translateY(0px); }
+
+/* ---------- Quiz card ---------- */
+#quiz{ display:none; }
+
+.progress-row{
+  margin-bottom:18px;
+}
+.progress-label{
+  font-size:13px;
+  color:var(--cream-dim);
+  letter-spacing:0.03em;
+}
+
+.progress-track{
+  height:3px;
+  background:#2a2531;
+  border-radius:2px;
+  overflow:hidden;
+  margin-bottom:28px;
+}
+.progress-fill{
+  height:100%;
+  background:var(--gold);
+  width:0%;
+  transition:width 0.3s ease;
+}
+
+.card{
+  background:var(--bg-raised);
+  border:1px solid #2a2531;
+  border-radius:4px;
+  padding:32px 28px;
+}
+
+.illustration{
+  width:100%;
+  max-width:220px;
+  margin:0 auto 24px;
+  display:block;
+}
+
+.question-text{
+  font-size:19px;
+  font-weight:600;
+  margin-bottom:26px;
+}
+
+.options{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.option{
+  text-align:left;
+  background:#211c28;
+  border:1px solid #332c3d;
+  color:var(--cream);
+  padding:14px 16px;
+  font-family:'Work Sans', sans-serif;
+  font-size:15px;
+  border-radius:3px;
+  cursor:pointer;
+  transition:border-color 0.15s ease, background 0.15s ease;
+}
+.option:hover:not(:disabled){ border-color:var(--gold); background:#2a2333; }
+.option:disabled{ cursor:default; }
+.option.correct{ background:rgba(78,156,110,0.18); border-color:var(--good); }
+.option.incorrect{ background:rgba(180,69,58,0.18); border-color:var(--bad); }
+
+.feedback{
+  margin-top:20px;
+  font-size:14px;
+  color:var(--cream-dim);
+  min-height:0;
+}
+.feedback.show{
+  padding-top:16px;
+  border-top:1px solid #2a2531;
+}
+.feedback strong{ color:var(--gold); }
+
+.next-btn{
+  display:none;
+  margin-top:22px;
+  background:none;
+  border:1px solid var(--gold);
+  color:var(--gold);
+  padding:12px 28px;
+  font-family:'Bebas Neue', sans-serif;
+  font-size:16px;
+  letter-spacing:0.05em;
+  border-radius:2px;
+  cursor:pointer;
+  float:right;
+}
+.next-btn:hover{ background:rgba(227,178,60,0.1); }
+
+/* ---------- Result ---------- */
+#result{ display:none; text-align:center; padding:24px 8px; }
+#result .score{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:96px;
+  color:var(--gold);
+  line-height:1;
+  margin-bottom:8px;
+}
+#result .score span{ font-size:36px; color:var(--cream-dim); }
+#result .verdict{ font-size:16px; color:var(--cream-dim); margin-bottom:32px; }
+#restart-btn{
+  background:var(--velvet);
+  color:var(--cream);
+  border:none;
+  padding:14px 34px;
+  font-family:'Bebas Neue', sans-serif;
+  font-size:18px;
+  letter-spacing:0.05em;
+  border-radius:2px;
+  cursor:pointer;
+}
+#restart-btn:hover{ background:#a4283a; }
+
+@media (max-width:480px){
+  .card{ padding:24px 18px; }
+  #splash{ padding:32px 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- Splash screen -->
+  <div id="splash">
+    <svg class="lamp" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M32 4 L52 24 L44 24 L44 40 L20 40 L20 24 L12 24 Z" fill="#E3B23C"/>
+      <rect x="26" y="40" width="12" height="16" fill="#8B1E2B"/>
+      <rect x="18" y="56" width="28" height="4" rx="1" fill="#8B1E2B"/>
+    </svg>
+    <h1 class="marquee">FILMQUIZ</h1>
+    <p>8 frågor. Inget nåder för glömska minnen.</p>
+    <div class="meta">Runtime: ca 4–6 minuter</div>
+    <button id="start-btn" class="marquee">Kör igång</button>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz">
+    <div class="progress-row">
+      <span class="progress-label" id="progress-label">Fråga 1 / 8</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="card">
+      <div id="illustration-slot"></div>
+      <div class="question-text" id="question-text"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn marquee" id="next-btn">Nästa →</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result">
+    <div class="score"><span id="score-num">0</span><span> / 8</span></div>
+    <div class="verdict marquee" id="verdict" style="font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:0.04em;"></div>
+    <button id="restart-btn" class="marquee">Kör igen</button>
+  </div>
+
+</div>
+
+<script>
+const svgBond = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="70" r="46" fill="none" stroke="#E3B23C" stroke-width="3"/>
+  <circle cx="100" cy="70" r="20" fill="none" stroke="#E3B23C" stroke-width="3"/>
+  <rect x="60" y="20" width="14" height="40" fill="#8B1E2B" transform="rotate(35 67 40)"/>
+  <circle cx="100" cy="70" r="4" fill="#F2EDE4"/>
+</svg>`;
+
+const svgPoke = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="70" r="50" fill="#211c28" stroke="#8B1E2B" stroke-width="3"/>
+  <path d="M50 70 A50 50 0 0 1 150 70" fill="#8B1E2B"/>
+  <rect x="50" y="66" width="100" height="8" fill="#121016"/>
+  <circle cx="100" cy="70" r="16" fill="#F2EDE4" stroke="#121016" stroke-width="3"/>
+  <circle cx="100" cy="70" r="6" fill="#121016"/>
+</svg>`;
+
+const svgTwoFace = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <path d="M70 30 h60 v70 a30 30 0 0 1 -60 0 z" fill="none" stroke="#E3B23C" stroke-width="3"/>
+  <line x1="100" y1="30" x2="100" y2="100" stroke="#E3B23C" stroke-width="3"/>
+  <circle cx="85" cy="55" r="4" fill="#E3B23C"/>
+  <circle cx="115" cy="55" r="4" fill="#8B1E2B"/>
+  <line x1="70" y1="95" x2="130" y2="95" stroke="#4A3B5C" stroke-width="3"/>
+</svg>`;
+
+const svgMatrix = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="42" r="16" fill="none" stroke="#F2EDE4" stroke-width="3"/>
+  <path d="M80 60 L60 120 L140 120 L120 60 Q100 75 80 60 Z" fill="#8B1E2B"/>
+  <rect x="0" y="0" width="200" height="140" fill="none"/>
+  <text x="100" y="135" text-anchor="middle" fill="#4A3B5C" font-family="monospace" font-size="10">01 10 01 10</text>
+</svg>`;
+
+const svgNolan = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="70" r="48" fill="none" stroke="#4A3B5C" stroke-width="3"/>
+  <line x1="100" y1="70" x2="100" y2="34" stroke="#E3B23C" stroke-width="3"/>
+  <line x1="100" y1="70" x2="126" y2="86" stroke="#E3B23C" stroke-width="3"/>
+  <circle cx="100" cy="70" r="4" fill="#F2EDE4"/>
+</svg>`;
+
+const svgSpaceballs = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="100,20 130,90 100,75 70,90" fill="#4A3B5C" stroke="#E3B23C" stroke-width="2"/>
+  <rect x="94" y="88" width="12" height="30" fill="#8B1E2B"/>
+  <circle cx="60" cy="110" r="10" fill="none" stroke="#F2EDE4" stroke-width="2"/>
+  <circle cx="140" cy="110" r="6" fill="none" stroke="#F2EDE4" stroke-width="2"/>
+</svg>`;
+
+const svgTokyo = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <rect x="40" y="50" width="20" height="60" fill="#211c28" stroke="#4A3B5C" stroke-width="2"/>
+  <rect x="70" y="30" width="24" height="80" fill="#211c28" stroke="#4A3B5C" stroke-width="2"/>
+  <rect x="106" y="55" width="18" height="55" fill="#211c28" stroke="#4A3B5C" stroke-width="2"/>
+  <rect x="134" y="40" width="22" height="70" fill="#211c28" stroke="#4A3B5C" stroke-width="2"/>
+  <circle cx="82" cy="50" r="5" fill="#E3B23C"/>
+  <circle cx="115" cy="70" r="4" fill="#E3B23C"/>
+  <circle cx="145" cy="60" r="4" fill="#E3B23C"/>
+</svg>`;
+
+const svgHeat = `<svg class="illustration" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="70" cy="70" r="28" fill="none" stroke="#E3B23C" stroke-width="3"/>
+  <circle cx="130" cy="70" r="28" fill="none" stroke="#8B1E2B" stroke-width="3"/>
+  <line x1="94" y1="70" x2="106" y2="70" stroke="#F2EDE4" stroke-width="2" stroke-dasharray="3 3"/>
+</svg>`;
+
+const QUESTIONS = [
+  {
+    text: "I vilken bondfilm spelar Sean Bean MI6-agenten Alec Trevelyan (agent 006)?",
+    illustration: svgBond,
+    options: ["GoldenEye", "Tomorrow Never Dies", "The World Is Not Enough", "Licence to Kill"],
+    correct: 0
+  },
+  {
+    text: "I den första Pokémon-filmen från 1998 skapar forskare en ny Pokémon, vilken?",
+    illustration: svgPoke,
+    options: ["Mewtwo", "Mew", "Ditto", "Deoxys"],
+    correct: 0
+  },
+  {
+    text: "The Dark Knight placerar sig på #3 i IMDb:s topp 250-lista, men den är bättre än både Gudfadern och Nyckeln till frihet så den borde ligga högre. Alla vet ju att Harvey Dent är Two-Face, men vad var hans yrke innan karriären sket sig?",
+    illustration: svgTwoFace,
+    options: ["Åklagare", "Polischef", "Domare", "Advokat"],
+    correct: 0
+  },
+  {
+    text: "I filmen The Matrix, vilken färg är det på klänningen?",
+    illustration: svgMatrix,
+    options: ["Röd", "Gul", "Grön", "Vit"],
+    correct: 0
+  },
+  {
+    text: "Tre av dessa filmer har någonting gemensamt, en passar inte in, vilken?",
+    illustration: svgNolan,
+    options: ["Memento", "Tenet", "Se7en", "Interstellar"],
+    correct: 2,
+    explanation: "De andra tre är regisserade av Christopher Nolan och kretsar alla kring tid på ett eller annat sätt."
+  },
+  {
+    text: "Vilken film döljer sig bakom denna beskrivningen? (Engelska titeln) Med hjälp av ringen på sitt finger som skjuter ut ett lasersvärd och \"the schwartz\" försöker Lord Helmet stjäla atmosfären ifrån den fredliga planeten Druidia. För att stoppa honom kallar man in Lone Starr, Barf och den visa Yogurt.",
+    illustration: svgSpaceballs,
+    options: ["Spaceballs", "Galaxy Quest", "Mars Attacks!", "Men in Black"],
+    correct: 0
+  },
+  {
+    text: "I vilken asiatisk stad utspelar sig filmen där två främlingar hittar varandra på ett lyxhotell? Mannen i 50-årsåldern och kvinnan i 20-årsåldern.",
+    illustration: svgTokyo,
+    options: ["Tokyo", "Seoul", "Shanghai", "Hongkong"],
+    correct: 0,
+    explanation: "Filmen är Lost in Translation (2003). Bill Murray var 52 år och Scarlett Johansson 17 år när den spelades in."
+  },
+  {
+    text: "Filmen Heat från 1995 har skådespelaren Val Kilmer med sig (RIP) och handlar om två sidor av lagen. Detta var första gången två av filmhistoriens största skådespelare möttes på duken i samma scen, vilka två är det?",
+    illustration: svgHeat,
+    options: ["Robert De Niro & Al Pacino", "Jack Nicholson & Christopher Walken", "Dustin Hoffman & Gene Hackman", "Morgan Freeman & Clint Eastwood"],
+    correct: 0,
+    explanation: "Den berömda cafe-scenen — första gången De Niro och Pacino delade skärmtid."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+const splashEl = document.getElementById('splash');
+const quizEl = document.getElementById('quiz');
+const resultEl = document.getElementById('result');
+const startBtn = document.getElementById('start-btn');
+const restartBtn = document.getElementById('restart-btn');
+const nextBtn = document.getElementById('next-btn');
+const progressLabel = document.getElementById('progress-label');
+const progressFill = document.getElementById('progress-fill');
+const illustrationSlot = document.getElementById('illustration-slot');
+const questionText = document.getElementById('question-text');
+const optionsEl = document.getElementById('options');
+const feedbackEl = document.getElementById('feedback');
+
+startBtn.addEventListener('click', () => {
+  splashEl.style.display = 'none';
+  quizEl.style.display = 'block';
+  loadQuestion();
+});
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  resultEl.style.display = 'none';
+  quizEl.style.display = 'block';
+  loadQuestion();
+});
+
+nextBtn.addEventListener('click', () => {
+  current++;
+  if (current < QUESTIONS.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+});
+
+function shuffle(array){
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+let currentOrder = [];
+
+function loadQuestion(){
+  answered = false;
+  const q = QUESTIONS[current];
+  progressLabel.textContent = `Fråga ${current + 1} / ${QUESTIONS.length}`;
+  progressFill.style.width = `${(current / QUESTIONS.length) * 100}%`;
+  illustrationSlot.innerHTML = q.illustration;
+  questionText.textContent = q.text;
+  feedbackEl.classList.remove('show');
+  feedbackEl.innerHTML = '';
+  nextBtn.style.display = 'none';
+
+  currentOrder = shuffle(q.options.map((_, i) => i));
+
+  optionsEl.innerHTML = '';
+  currentOrder.forEach((origIndex, displayIndex) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = q.options[origIndex];
+    btn.addEventListener('click', () => selectAnswer(displayIndex));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(displayIndex){
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[current];
+  const chosenOrigIndex = currentOrder[displayIndex];
+  const correctDisplayIndex = currentOrder.indexOf(q.correct);
+  const buttons = optionsEl.querySelectorAll('.option');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === correctDisplayIndex) btn.classList.add('correct');
+    else if (i === displayIndex) btn.classList.add('incorrect');
+  });
+
+  let html = '';
+  if (chosenOrigIndex === q.correct) {
+    score++;
+    html += `<strong>Rätt!</strong>`;
+  } else {
+    html += `<strong>Fel.</strong> Rätt svar var ${q.options[q.correct]}.`;
+  }
+  if (q.explanation) html += `<br>${q.explanation}`;
+  feedbackEl.innerHTML = html;
+  feedbackEl.classList.add('show');
+
+  nextBtn.textContent = current === QUESTIONS.length - 1 ? 'Se resultat →' : 'Nästa →';
+  nextBtn.style.display = 'block';
+}
+
+function showResult(){
+  quizEl.style.display = 'none';
+  resultEl.style.display = 'block';
+  document.getElementById('score-num').textContent = score;
+  const verdictEl = document.getElementById('verdict');
+  let verdict;
+  if (score === 8) verdict = "Perfekt. Går du på filmklubb i smyg?";
+  else if (score >= 6) verdict = "Stark insats, du kan din film.";
+  else if (score >= 4) verdict = "Helt okej, men lite mer Letterboxd i vinter.";
+  else verdict = "Dags att öppna Netflix igen.";
+  verdictEl.textContent = verdict;
+}
+</script>
+
+</body>
+</html>
